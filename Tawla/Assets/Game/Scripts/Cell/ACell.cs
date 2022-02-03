@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,8 +6,8 @@ using UnityEngine;
 public abstract class ACell : MonoBehaviour
 {
 
-	[SerializeField] int Id;
-	//[SerializeField] int backwordId;
+	[SerializeField]protected int Id;
+	[SerializeField] internal int CellIndx;
 
 	private Stack<ARock> rocksStack = new Stack<ARock>();
 	
@@ -15,11 +16,6 @@ public abstract class ACell : MonoBehaviour
 	public const float maxDistanceScale = 2.15f;
 
 
-	internal virtual void Awake()
-	{
-		Id = transform.GetSiblingIndex();
-	    //	backwordId = 23-transform.GetSiblingIndex();
-	}
 
 	internal Vector2 GetNextRockPosition()
 	{
@@ -58,12 +54,12 @@ public abstract class ACell : MonoBehaviour
 		{
 			if (Id < 12)
 			{
-				aRocksArray[i].StopAnimation();
+				aRocksArray[i].StopMovmentAnimation();
 				aRocksArray[i].transform.position = transform.position  + Vector3.down * distance  * (aRocksArray.Length-1 - i);
 			}
 			else
 			{
-				aRocksArray[i].StopAnimation();
+				aRocksArray[i].StopMovmentAnimation();
 				aRocksArray[i].transform.position = transform.position  + Vector3.up   * distance   * (aRocksArray.Length-1 - i);
 			}
 		}
@@ -79,15 +75,21 @@ public abstract class ACell : MonoBehaviour
 		{
 			if (Id < 12)
 			{
-				aRocksArray[i].StopAnimation();
+				aRocksArray[i].StopMovmentAnimation();
 				aRocksArray[i].transform.position = transform.position + Vector3.down * distance * (aRocksArray.Length -1 - i);
 			}
 			else
 			{
-				aRocksArray[i].StopAnimation();
+				aRocksArray[i].StopMovmentAnimation();
 				aRocksArray[i].transform.position = transform.position + Vector3.up * distance * (aRocksArray.Length - i-1);
 			}
 		}
+	}
+
+	internal virtual int GetIndex()
+	{
+	
+		return TurnManager.Instance.curretTurnColor == GameIntilizer.Instance.mainPlayerColor ? Id : 23 - Id;
 	}
 
 	internal virtual bool AddRockToStack(ARock aRock) {
@@ -109,19 +111,32 @@ public abstract class ACell : MonoBehaviour
 		return rock;
 	}
 
-	internal ARock GetLastRockInStack()
+	internal ARock GetLastRockInCellStack()
 	{
 		ARock rock = rocksStack.Peek();
 		return rock;
 	}
 
-	internal int GetRocksCount() {
+	internal int GetRocksCountInCell() {
 		return rocksStack.Count; 
 	}	
 
-	internal virtual void Higlight()
+	internal virtual void ShowHigligtRock()
 	{
-		CellsManager.Instance.Higlight(this);
+		CellsManager.Instance.ShowHiglightRock(this);
+	}
+
+	protected void DiceValuesUpdated(List<int> diceValues)
+	{
+		//check valid rocks in cell
+		bool cellHaveValidRock = GetRocksCountInCell() != 0 && GetLastRockInCellStack()._rockColor == TurnManager.Instance.curretTurnColor;
+		if (!cellHaveValidRock) return;
+
+		//bind the rock with values
+		var lastRockInCellRock = GetLastRockInCellStack();
+		int validTargetCellsCount = lastRockInCellRock.CheckVaildMovmentCellForDiceValues(diceValues);
+
+		CellsManager.Instance._PLayerHaveValidMoves = CellsManager.Instance._PLayerHaveValidMoves || validTargetCellsCount > 0;
 	}
 
 }

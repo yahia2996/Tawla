@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,40 +6,78 @@ using UnityEngine;
 public class CellsManager : MonoSinglton<CellsManager>
 {
 	[SerializeField]   ACell []_Bordcells;
-	[SerializeField]    HiglighterRock _HigligtPrefab;
+	[SerializeField]   HiglighterRock _HigligtPrefab;
 
 	[SerializeField] ACell outCell1;
 	[SerializeField] ACell outCell2;
 
-	public ACell getCell(int i, ColorEnum color)
+
+	public bool _PLayerHaveValidMoves = true;
+
+
+	public Stack<HiglighterRock> savedrocksStack = new Stack<HiglighterRock>();
+	public Stack<HiglighterRock> usedRocksStack = new Stack<HiglighterRock>();
+
+
+	public static int targetCellIndex;
+
+	public HiglighterRock _Higligtrock
 	{
-		if(color == GameIntilizer.Instance.mainPlayer) 
-		return getCellForword(i);
-		else
-		return getCellBackword(i);
+		get {
+			if (savedrocksStack.Count > 0)
+			{
+				HiglighterRock higlighterRock  = savedrocksStack.Pop();
+				usedRocksStack.Push(higlighterRock);
+				return higlighterRock;
+			}
+			else {
+				HiglighterRock higlighterRock = Instantiate(_HigligtPrefab, _HigligtPrefab.transform.parent);
+				usedRocksStack.Push(higlighterRock);
+				return higlighterRock;
+			}	
+		}		
 	}
 
-	public ACell getCellForword(int i)
+	internal void ClearHiglight()
 	{
-		if (i > _Bordcells.Length-1) return outCell1;
-		return _Bordcells[i];
+		while (usedRocksStack.Count > 0) {
+			HiglighterRock higlighterRock = usedRocksStack.Pop();
+			higlighterRock.RestParent();
+			savedrocksStack.Push(higlighterRock);
+		}
+	}
+
+	internal ACell GetCell(int cellIndex)
+	{
+		if(TurnManager.Instance.curretTurnColor == GameIntilizer.Instance.mainPlayerColor) 
+		return getCellForword(cellIndex);
+		else
+		return getCellBackword(cellIndex);
+	}
+
+	public ACell getCellForword(int cellIndex)
+	{
+		if (cellIndex > _Bordcells.Length-1) return outCell1;
+		targetCellIndex = cellIndex;
+		return _Bordcells[cellIndex];
 		
 	}
 
-	public ACell getCellBackword(int i)
+	public ACell getCellBackword(int cellIndex)
 	{
-		if (i > _Bordcells.Length-1) return outCell2;
-		return _Bordcells[23-i];
+		if (cellIndex > _Bordcells.Length-1) return outCell2;
+		targetCellIndex = 23 - cellIndex;
+		return _Bordcells[23-cellIndex];
 	}
 
 
-	internal void Higlight(ACell cell) {
-		Vector2 pos = cell.GetNextRockPositionBeforeAddingToStack(cell.GetRocksCount());
-		_HigligtPrefab.Cell = cell; 
-		_HigligtPrefab.transform.parent = cell.transform;
-		_HigligtPrefab.transform.SetAsFirstSibling();
-
-		_HigligtPrefab.transform.position = pos;
+	internal void ShowHiglightRock(ACell cell) {
+		Vector2 pos = cell.GetNextRockPositionBeforeAddingToStack(cell.GetRocksCountInCell());
+		var higlight = _Higligtrock;
+		higlight.cell = cell;
+		higlight.transform.parent = cell.transform;
+		higlight.transform.SetAsFirstSibling();
+		higlight.transform.position = pos;
 	}
 
 

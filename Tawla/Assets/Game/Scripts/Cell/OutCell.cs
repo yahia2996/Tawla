@@ -4,16 +4,23 @@ using UnityEngine;
 
 public class OutCell : ACell
 {
-
-	internal override void Awake()
-	{
-		//backwoedId = 23 - transform.GetSiblingIndex();
-	}
-
-
 	internal override bool AddRockToStack(ARock aRock)
 	{
-		aRock._canMoveClick = false;
+		aRock._insideBord = false;
 		return base.AddRockToStack(aRock);
 	}
+	private void Start()
+	{
+		//rigister to Action
+		DiceManagers.Instance.DicesValuesUpdtatedAction += DiceValuesUpdated;
+	}
+
+
+	internal override int GetIndex()
+	{
+		return CellIndx;
+		//return TurnManager.Instance.curretTurnColor == GameIntilizer.Instance.mainPlayerColor ? CellIndx : 23 - Id;
+
+	}
+
 }

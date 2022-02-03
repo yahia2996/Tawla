@@ -18,12 +18,12 @@ public class GameIntilizer : MonoSinglton<GameIntilizer>
 	[SerializeField]	RectTransform cell1;
 	[SerializeField]	RectTransform cell2;
 
-	public ColorEnum mainPlayer;
+	public ColorEnum mainPlayerColor;
 
 	void Start()
     {
 		Application.targetFrameRate = 60;
-		IntilizeRocks(mainPlayer == ColorEnum.white);   
+		IntilizeRocks(mainPlayerColor == ColorEnum.white);   
     }
 
 	private void IntilizeRocks(bool myColor)

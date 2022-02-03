@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,18 +6,26 @@ using UnityEngine.EventSystems;
 public class HiglighterRock : MonoBehaviour, IPointerDownHandler
 {
 	[SerializeField]
-	Transform _deultParent; 
+	Transform _deultParent;
 
-	private ACell cell;
-
-	public ACell Cell { get => cell; set => cell = value; }
+	internal ACell cell;
+	
 
 	public void OnPointerDown(PointerEventData eventData)
 	{
-		Rock._selectedRock.MoveToCell(cell);
+		HighlightClicked();	
+	}
+
+
+	void HighlightClicked() {
+		CellsManager.Instance.ClearHiglight();
+		Rock._currentClickedRock.MoveToCell(cell);
+		//TurnManager.Instance.Turn();
+		Rock._currentClickedRock = null;
+	}
+
+	internal void RestParent()
+	{
 		transform.parent = _deultParent;
-
-		TurnManager.Instance.Turn();
-
 	}
 }

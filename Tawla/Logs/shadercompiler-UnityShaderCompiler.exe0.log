@@ -1,3 +1,4 @@
 Base path: 'E:/Yahia/Unity Editor/2020.3.8f1 setup/Editor/Data', plugins path 'E:/Yahia/Unity Editor/2020.3.8f1 setup/Editor/Data/PlaybackEngines'
 Cmd: initializeCompiler
 
+Cmd: shutdown

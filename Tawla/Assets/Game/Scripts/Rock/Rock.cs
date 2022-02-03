@@ -5,29 +5,60 @@ using UnityEngine;
 
 public class Rock : ARock
 {
-	internal override void RockClicked()
+	protected override void RockClicked()
 	{
-		if (movmentAnimation!=null||Dice.Instance._diceOneValue==-1) return;
 
-		_selectedRock = this;
+		/*bool isRockMoving = movmentAnimation != null;
+
+		if (isRockMoving || Dice.Instance._diceValue==-1) return;
+
+		_currentClickedRock = this;
+
+		CellsManager.Instance.ClearHiglight();
 
 
-		bool positionOne = CheckMovment(Dice.Instance._diceOneValue);
+		bool positionOne = CheckMovment(Dice.Instance._diceValue);
+		//bool positionTwo = CheckMovment(Dice.Instance._diceTwoValue);
 
 
 		if (positionOne) {
-			ACell cell = CellsManager.Instance.getCell(_indexOnBord + Dice.Instance._diceOneValue, _rockType);
-			cell.Higlight();
+			ACell cell = CellsManager.Instance.getCell(_indexOnBord + Dice.Instance._diceValue, _rockColor);
+			cell.ShowHigligtRock();
+		}*/
+
+		CellsManager.Instance.ClearHiglight();
+		//if (TurnManager.Instance.curretTurnColor == this._rockColor)
+		{
+
+			if (_currentClickedRock != this)
+			{
+				_currentClickedRock = this;
+				for (int i = 0; i < validCellsToMove.Count; i++)
+				{
+					validCellsToMove[i].ShowHigligtRock();
+				}
+			}
+			else {
+				_currentClickedRock = null;
+			}
 		}
 
-	    //bool positiontwo = CheckMovment(Dice.Instance._diceTwoValue);
+
+
+		/*if (positionTwo)
+		{
+			ACell cell = CellsManager.Instance.getCell(_indexOnBord + Dice.Instance._diceTwoValue, _rockColor);
+			cell.ShowHigligtRock();
+		}*/
+
+		//bool positiontwo = CheckMovment(Dice.Instance._diceTwoValue);
 
 		//
 
 
 
 		//to remove
-	
+
 		/*Cell cell = CellsManager.Instance.getCell(_indexOnBord + Dice.Instance._diceOneValue, _rockType);
 		if (cell)
 		{
@@ -37,36 +68,79 @@ public class Rock : ARock
 		//		
 	}
 
-	internal override bool CheckMovment(int movment) {
-		ACell cell = CellsManager.Instance.getCell(_indexOnBord+movment,_rockType);
 
-		if (cell == null) return false;
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="diceValues"></param>
+	/// <returns></returns>
+	internal override int CheckVaildMovmentCellForDiceValues(List<int> diceValues)
+	{
+		validCellsToMove = new List<ACell>();
+		//int sumOfValues = 0;
 
-		if (cell.GetRocksCount() > 1)
+		//check evrey value
+		for (int i = 0; i < diceValues.Count; i++)
 		{
-			if (cell.GetLastRockInStack()._rockType == _rockType)
+			ACell validCell = CheckMovmentIsValid(diceValues[i]);
+			if (validCell!=null) {
+				validCellsToMove.Add(validCell);
+				//sumOfValues += diceValues[i];
+			}
+		}
+
+		//if all values are valid check agains sum of values
+		/*if (diceValues.Count == validCellsToMove.Count&&validCellsToMove.Count>0) {
+			ACell validCell = CheckMovmentIsValid(sumOfValues);
+			if (validCell != null)
 			{
-				return true;
+				validCellsToMove.Add(validCell);
+			}
+		}*/
+
+		return validCellsToMove.Count;
+	}
+
+	protected override ACell CheckMovmentIsValid(int movment) {
+		ACell cell = CellsManager.Instance.GetCell(_currentIndexOnBord+movment);
+
+		if (cell == null) return null;
+
+		if (cell.GetRocksCountInCell() > 1)
+		{
+			if (cell.GetLastRockInCellStack()._rockColor == _rockColor)
+			{
+				return cell;
 			}
 			else {
-				return false;
+				return null;
 			}
 		}
 		else
 		{
-			return true;
+			return cell;
 		}
 	}
 
-	internal override void MoveToCell(ACell targetCell) {			
-
+	internal override void MoveToCell(ACell targetCell) {
+		
+		
 		//update stacks
-		ACell currentCell = CellsManager.Instance.getCell(_indexOnBord, _rockType);
+		ACell currentCell = CellsManager.Instance.GetCell(_currentIndexOnBord);
 		currentCell.RemoveFromStack();
 		targetCell.AddRockToStack(this);
 
-		//update rock index
-		_indexOnBord = _indexOnBord + Dice.Instance._diceOneValue;
+
+
+		//update rock index	
+		//update position
+		int moveAmount = targetCell.GetIndex() - _currentIndexOnBord;
+		_currentIndexOnBord += moveAmount;
+
+
+		//update movment Budget
+		DiceManagers.Instance.UpdateMovmentBudget(moveAmount);
+
 
 		//start movment lerp
 		if (movmentAnimation != null)
@@ -77,7 +151,8 @@ public class Rock : ARock
 
 	IEnumerator MoveAnimation(Vector2 target) {
 		float lerpSpeed = 12;
-		while (Vector2.Distance(transform.position, target) > 0.2f)
+		float minLerpDistance = 0.2f;
+		while (Vector2.Distance(transform.position, target) > minLerpDistance)
 		{
 			transform.position = Vector2.LerpUnclamped(transform.position, target, lerpSpeed * Time.deltaTime);
 			yield return null;

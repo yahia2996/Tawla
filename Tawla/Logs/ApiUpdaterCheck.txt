@@ -108,3 +108,23 @@ C# parse time         : 291ms
 candidates check time : 52ms
 console write time    : 0ms
 
+[api-updater (non-obsolete-error-filter)] 2/3/2022 4:41:34 PM : Starting E:/Yahia/Unity Editor/2020.3.8f1 setup/Editor/Data/Tools/ScriptUpdater/APIUpdater.NonObsoleteApiUpdaterDetector.exe
+[api-updater (non-obsolete-error-filter)] 
+----------------------------------
+jit/startup time      : 505.9678ms
+moved types parse time: 88ms
+candidates parse time : 23ms
+C# parse time         : 581ms
+candidates check time : 71ms
+console write time    : 1ms
+
+[api-updater (non-obsolete-error-filter)] 2/3/2022 4:41:58 PM : Starting E:/Yahia/Unity Editor/2020.3.8f1 setup/Editor/Data/Tools/ScriptUpdater/APIUpdater.NonObsoleteApiUpdaterDetector.exe
+[api-updater (non-obsolete-error-filter)] 
+----------------------------------
+jit/startup time      : 87.0275ms
+moved types parse time: 73ms
+candidates parse time : 1ms
+C# parse time         : 276ms
+candidates check time : 67ms
+console write time    : 0ms
+

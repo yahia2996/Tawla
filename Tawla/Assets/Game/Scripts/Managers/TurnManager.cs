@@ -6,13 +6,13 @@ using UnityEngine;
 
 public class TurnManager : MonoSinglton<TurnManager>
 {
-	public ColorEnum curretTurn;
-	public ColorEnum CurretTurn { get => curretTurn; set => curretTurn = value; }
+	public ColorEnum curretTurnColor;
+	public ColorEnum CurretTurnType { get => curretTurnColor; set => curretTurnColor = value; }
 
 	internal void Turn()
 	{
-		//Dice.Instance.ResetDice();
-		//curretTurn =(ColorEnum) (1 + ((int)curretTurn * -1));
+		DiceManagers.Instance.RestDices();
+		curretTurnColor = (ColorEnum) (1 + ((int)curretTurnColor * -1));
 	}
 }
 

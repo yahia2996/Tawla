@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
@@ -6,24 +7,16 @@ using UnityEngine.UI;
 
 namespace Ludo
 {
-	public class Dice : MonoSinglton<Dice>
+	public class Dice : MonoBehaviour
 	{
 		public TMPro.TMP_Text diceValueTxt;
-		public UnityAction<int> diceRollResut;
 		private Coroutine diceAnimation;
+		public int _diceValue = -1;
+		internal Action<int> _diceRollDoneAction;
 
-		public int _diceOneValue = -1;
-
-		private void Update()
-		{
-			if (Input.GetKeyDown(KeyCode.Space))
-			{
-				RollDice();
-			}
-		}
-
-
-		private void RollDice()
+		float waitingSeconds = 0.025f;
+		
+		internal void RollDice()
 		{
 			if(diceAnimation==null)
 			diceAnimation = StartCoroutine(RollDiceAnimation());
@@ -37,37 +30,20 @@ namespace Ludo
 				randomValueResult = UnityEngine.Random.Range(1, 7);
 				if (diceValueTxt)
 				{
-					_diceOneValue = randomValueResult;
-					diceValueTxt.text = randomValueResult + "";
+					//dice one
+					_diceValue = randomValueResult;
+					diceValueTxt.text = randomValueResult + "";					
 				}
-				yield return new WaitForSeconds(0.025f);
+				yield return new WaitForSeconds(waitingSeconds);
 			}
-			diceRollResut?.Invoke(randomValueResult);
+			_diceRollDoneAction?.Invoke(randomValueResult);
 			diceAnimation = null;
 		}
-
-		internal void Active()
+		
+		internal void ResetDice()
 		{
-			transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
-		}
-
-		internal void DeActive()
-		{
-			ResetDice();
-			transform.localScale = new Vector3(1, 1, 1);
-		}
-
-		internal void TurnDone()
-		{
-			//sumOfvalueSended = 0;
-			//numOfAvaterSended = 0;
-			//TurnsManager.instance.DoNextPlayerTurn();
-		}
-
-		public void ResetDice()
-		{
-			_diceOneValue = -1;
-			diceValueTxt.text = "*";
+			_diceValue = -1;
+			diceValueTxt.text = "*";		
 		}
 	}
 
