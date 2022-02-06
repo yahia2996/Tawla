@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class Cell : ACell
 {
-	//public static int ValidMoves = -1; 
-
 	internal virtual void Awake()
 	{
 		Id = transform.GetSiblingIndex();

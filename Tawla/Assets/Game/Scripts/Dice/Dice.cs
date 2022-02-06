@@ -11,10 +11,12 @@ namespace Ludo
 	{
 		public TMPro.TMP_Text diceValueTxt;
 		private Coroutine diceAnimation;
-		public int _diceValue = -1;
+		[HideInInspector]public int _diceValue = -1;
+		public int defaultDiceValue = 3;
+
 		internal Action<int> _diceRollDoneAction;
 
-		float waitingSeconds = 0.025f;
+		float RollDiceAnimationWaitingSeconds = 0.025f;
 		
 		internal void RollDice()
 		{
@@ -27,14 +29,17 @@ namespace Ludo
 			int randomValueResult = 0;
 			for (int i = 0; i < 20; i++)
 			{
+				if(!DiceManagers.Instance._cheat)
 				randomValueResult = UnityEngine.Random.Range(1, 7);
+				else
+					randomValueResult = defaultDiceValue;
+
 				if (diceValueTxt)
 				{
-					//dice one
 					_diceValue = randomValueResult;
 					diceValueTxt.text = randomValueResult + "";					
 				}
-				yield return new WaitForSeconds(waitingSeconds);
+				yield return new WaitForSeconds(RollDiceAnimationWaitingSeconds);
 			}
 			_diceRollDoneAction?.Invoke(randomValueResult);
 			diceAnimation = null;
@@ -42,7 +47,7 @@ namespace Ludo
 		
 		internal void ResetDice()
 		{
-			_diceValue = -1;
+			_diceValue = defaultDiceValue;
 			diceValueTxt.text = "*";		
 		}
 	}

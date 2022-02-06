@@ -59,8 +59,7 @@ public class CellsManager : MonoSinglton<CellsManager>
 	{
 		if (cellIndex > _Bordcells.Length-1) return outCell1;
 		targetCellIndex = cellIndex;
-		return _Bordcells[cellIndex];
-		
+		return _Bordcells[cellIndex];		
 	}
 
 	public ACell getCellBackword(int cellIndex)

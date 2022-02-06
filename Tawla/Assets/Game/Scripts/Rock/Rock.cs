@@ -8,24 +8,6 @@ public class Rock : ARock
 	protected override void RockClicked()
 	{
 
-		/*bool isRockMoving = movmentAnimation != null;
-
-		if (isRockMoving || Dice.Instance._diceValue==-1) return;
-
-		_currentClickedRock = this;
-
-		CellsManager.Instance.ClearHiglight();
-
-
-		bool positionOne = CheckMovment(Dice.Instance._diceValue);
-		//bool positionTwo = CheckMovment(Dice.Instance._diceTwoValue);
-
-
-		if (positionOne) {
-			ACell cell = CellsManager.Instance.getCell(_indexOnBord + Dice.Instance._diceValue, _rockColor);
-			cell.ShowHigligtRock();
-		}*/
-
 		CellsManager.Instance.ClearHiglight();
 		//if (TurnManager.Instance.curretTurnColor == this._rockColor)
 		{
@@ -42,62 +24,46 @@ public class Rock : ARock
 				_currentClickedRock = null;
 			}
 		}
-
-
-
-		/*if (positionTwo)
-		{
-			ACell cell = CellsManager.Instance.getCell(_indexOnBord + Dice.Instance._diceTwoValue, _rockColor);
-			cell.ShowHigligtRock();
-		}*/
-
-		//bool positiontwo = CheckMovment(Dice.Instance._diceTwoValue);
-
-		//
-
-
-
-		//to remove
-
-		/*Cell cell = CellsManager.Instance.getCell(_indexOnBord + Dice.Instance._diceOneValue, _rockType);
-		if (cell)
-		{
-			//cell.AddToStack(this);
-			MoveToCell(cell);
-		}	*/
-		//		
 	}
 
-
 	/// <summary>
-	/// 
+	/// take list of dice values and updte validCells and return valid cells numbers
 	/// </summary>
 	/// <param name="diceValues"></param>
 	/// <returns></returns>
 	internal override int CheckVaildMovmentCellForDiceValues(List<int> diceValues)
 	{
-		validCellsToMove = new List<ACell>();
-		//int sumOfValues = 0;
+		validCellsToMove = new List<ACell>();		
 
-		//check evrey value
+		//check evrey value ability to moove the rock
 		for (int i = 0; i < diceValues.Count; i++)
 		{
 			ACell validCell = CheckMovmentIsValid(diceValues[i]);
 			if (validCell!=null) {
-				validCellsToMove.Add(validCell);
-				//sumOfValues += diceValues[i];
+				validCellsToMove.Add(validCell);				
 			}
 		}
 
-		//if all values are valid check agains sum of values
-		/*if (diceValues.Count == validCellsToMove.Count&&validCellsToMove.Count>0) {
-			ACell validCell = CheckMovmentIsValid(sumOfValues);
-			if (validCell != null)
+		//if we have two dice values and at least one move is valid we check also the summtion
+		if (diceValues.Count >= 2&& validCellsToMove.Count > 0) {
+			for (int i = 1; i < diceValues.Count; i++)
 			{
-				validCellsToMove.Add(validCell);
-			}
-		}*/
+				int sum = diceValues[0];
+				for (int j = 0; j < i; j++)
+				{
+					sum += diceValues[j+1]; 
+				}
 
+				ACell validCell = CheckMovmentIsValid(sum);
+				if (validCell != null)
+				{
+					validCellsToMove.Add(validCell);
+				}
+				else {
+					break;
+				}
+			}		
+		}
 		return validCellsToMove.Count;
 	}
 
@@ -122,25 +88,19 @@ public class Rock : ARock
 		}
 	}
 
-	internal override void MoveToCell(ACell targetCell) {
-		
+	internal override void MoveToCell(ACell targetCell) {		
 		
 		//update stacks
 		ACell currentCell = CellsManager.Instance.GetCell(_currentIndexOnBord);
 		currentCell.RemoveFromStack();
 		targetCell.AddRockToStack(this);
 
-
-
 		//update rock index	
-		//update position
-		int moveAmount = targetCell.GetIndex() - _currentIndexOnBord;
+		int moveAmount = targetCell.GetCellIndex() - _currentIndexOnBord;
 		_currentIndexOnBord += moveAmount;
-
 
 		//update movment Budget
 		DiceManagers.Instance.UpdateMovmentBudget(moveAmount);
-
 
 		//start movment lerp
 		if (movmentAnimation != null)

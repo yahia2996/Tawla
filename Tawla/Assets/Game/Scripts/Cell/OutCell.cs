@@ -16,7 +16,7 @@ public class OutCell : ACell
 	}
 
 
-	internal override int GetIndex()
+	internal override int GetCellIndex()
 	{
 		return CellIndx;
 		//return TurnManager.Instance.curretTurnColor == GameIntilizer.Instance.mainPlayerColor ? CellIndx : 23 - Id;

@@ -12,6 +12,10 @@ public class DiceManagers : MonoSinglton<DiceManagers>
 	public int _movmentBudget = 0;
 
 
+
+	public bool _cheat = true;
+
+
 	private void Start()
 	{
 		RegisterToDiceRollResult();
@@ -32,10 +36,15 @@ public class DiceManagers : MonoSinglton<DiceManagers>
 		}
 	}
 
-
+	/// <summary>
+	/// get the value of dice and add it to list
+	/// </summary>
+	/// <param name="val"></param>
 	void AddDiceValueToValueList(int val)
 	{
 		dicesValues.Add(val);
+
+		//when all dices have a values 
 		if (dicesValues.Count == _dices.Length)
 		{
 			GenrateAllPosibilitesOfResultValues();
@@ -47,39 +56,43 @@ public class DiceManagers : MonoSinglton<DiceManagers>
 	/// this method is one game logic take 2 dice value and generte all posibilites 
 	/// </summary>
 	void GenrateAllPosibilitesOfResultValues() {
+		
+		//update movemt budget by the count of 
 		_movmentBudget = dicesValues[0] + dicesValues[1];
-		/*if (dicesValues[0] == dicesValues[1])
+
+		//handle the double case by duplicate budget and values 
+		if (dicesValues[0] == dicesValues[1])
 		{
-			//dicesValues.RemoveAt(1);
 			dicesValues.Add(dicesValues[0]);
-			dicesValues.Add(dicesValues[0]);
-			dicesValues.Add(dicesValues[0] * 2);
-			dicesValues.Add(dicesValues[0] * 2);
-			dicesValues.Add(dicesValues[0] * 3);
+			dicesValues.Add(dicesValues[0]);		
 			_movmentBudget *= 2;
-		}*/
-		//_movmentBudget = 
-		dicesValues.Add(_movmentBudget);
-		FireUpdteValuesAction();
+		}
+
+		//fire the event dice values updated
+		FireDicesValuesUpdatedAction();
 	}
 
 	private void Update()
 	{
 		if (Input.GetKeyDown(KeyCode.Space))
 		{
-			RollDices();
+			RollAllDices();
 		}
 	}
 
-	void RollDices() {
+	/// <summary>
+	/// 
+	/// </summary>
+	internal void RollAllDices() {
 
 		//make sure no higlight just for test should removed and next steps
 		CellsManager.Instance.ClearHiglight();
 		Rock._currentClickedRock = null;
 
-		//rest prevuios values
+		//rest prevuios dices values
 		dicesValues.Clear();
 		dicesValues = new List<int>();
+
 		//roll dices
 		for (int i = 0; i < _dices.Length; i++)
 		{
@@ -89,30 +102,39 @@ public class DiceManagers : MonoSinglton<DiceManagers>
 
 	internal void UpdateMovmentBudget(int moveAmount)
 	{
-		CellsManager.Instance._PLayerHaveValidMoves = false;
 
 		_movmentBudget -= moveAmount;
-		bool removeThePropility = false;
+
+		bool _valueRemoved = false;
+		float restValue=0;
+
 		List<int> updtedValues = new List<int>();
 		for (int i = 0; i < dicesValues.Count; i++) {
-			if (_movmentBudget >= dicesValues[i]) {
+			if (_movmentBudget >= dicesValues[i]&&restValue<_movmentBudget) {
+				
 				//remove this value
-				if (dicesValues[i] == moveAmount && !removeThePropility) {
-					removeThePropility = true;
+				if (dicesValues[i] == moveAmount && !_valueRemoved) {
+					_valueRemoved = true;
 					continue;
 				}
+				restValue += dicesValues[i];
 				updtedValues.Add(dicesValues[i]);
 			}
 		}
 
 		dicesValues = updtedValues;
 
-		FireUpdteValuesAction();		
+		FireDicesValuesUpdatedAction();		
 
 	}
 
 
-	void FireUpdteValuesAction() {
+	void FireDicesValuesUpdatedAction() {
+
+		//rest move abillity
+		CellsManager.Instance._PLayerHaveValidMoves = false;
+
+
 		DicesValuesUpdtatedAction?.Invoke(dicesValues);
 		if (CellsManager.Instance._PLayerHaveValidMoves == false)
 		{
@@ -120,7 +142,8 @@ public class DiceManagers : MonoSinglton<DiceManagers>
 		}
 	}
 
-	void ChanngeTurn() {		
-			TurnManager.Instance.Turn();		
+	void ChanngeTurn() {
+		//CellsManager.Instance._PLayerHaveValidMoves = false;
+		TurnManager.Instance.Turn();		
 	}
 }

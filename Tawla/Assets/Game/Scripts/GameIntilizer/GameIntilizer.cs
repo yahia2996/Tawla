@@ -20,11 +20,17 @@ public class GameIntilizer : MonoSinglton<GameIntilizer>
 
 	public ColorEnum mainPlayerColor;
 
+	public Player main, second;
+
 	void Start()
     {
 		Application.targetFrameRate = 60;
-		IntilizeRocks(mainPlayerColor == ColorEnum.white);   
-    }
+		IntilizeRocks(mainPlayerColor == ColorEnum.white);
+
+		//set players colors
+		main.SetColor(mainPlayerColor);
+		second.SetColor((ColorEnum)(1 + ((int)mainPlayerColor * -1)));
+	}
 
 	private void IntilizeRocks(bool myColor)
 	{
@@ -45,12 +51,16 @@ public class GameIntilizer : MonoSinglton<GameIntilizer>
 			Rock.GetComponent<RectTransform>().position = startPoint.transform.position + Vector3.down * distancesBettweenRocks * i;
 			startPoint.AddRockToStack(Rock);
 		}
-		
-		for (int i = 0; i < 15; i++)
+
+
+		int number = 15;
+		for (int i = 0; i < number; i++)
 		{
 			ARock Rock = Instantiate(BlackRockPrefab, endPoint.transform);
 			Rock.GetComponent<RectTransform>().position = endPoint.transform.position + Vector3.up * distancesBettweenRocks * i;
 			endPoint.AddRockToStack(Rock);
 		}		
+
+
 	}
 }

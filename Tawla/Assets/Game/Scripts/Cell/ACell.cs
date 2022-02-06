@@ -5,17 +5,13 @@ using UnityEngine;
 
 public abstract class ACell : MonoBehaviour
 {
+	public const int numOfRocks = 15;
+	public const float maxDistanceScale = 2.15f;
 
 	[SerializeField]protected int Id;
 	[SerializeField] internal int CellIndx;
 
-	private Stack<ARock> rocksStack = new Stack<ARock>();
-	
-
-	public const int numOfRocks = 15;
-	public const float maxDistanceScale = 2.15f;
-
-
+	private Stack<ARock> rocksStack = new Stack<ARock>();	
 
 	internal Vector2 GetNextRockPosition()
 	{
@@ -86,7 +82,7 @@ public abstract class ACell : MonoBehaviour
 		}
 	}
 
-	internal virtual int GetIndex()
+	internal virtual int GetCellIndex()
 	{
 	
 		return TurnManager.Instance.curretTurnColor == GameIntilizer.Instance.mainPlayerColor ? Id : 23 - Id;
@@ -136,6 +132,7 @@ public abstract class ACell : MonoBehaviour
 		var lastRockInCellRock = GetLastRockInCellStack();
 		int validTargetCellsCount = lastRockInCellRock.CheckVaildMovmentCellForDiceValues(diceValues);
 
+		//set Valid Cells Properitey
 		CellsManager.Instance._PLayerHaveValidMoves = CellsManager.Instance._PLayerHaveValidMoves || validTargetCellsCount > 0;
 	}
 
